@@ -14,13 +14,33 @@ export async function fetch_DexScreener(token: string) {
     }
 }
 
+function sleep(ms: number) {
+    return new Promise(resolve => setTimeout(resolve, ms));
+}
+
+function randomJitter(maxJitter = 500) {
+    return Math.floor(Math.random() * maxJitter);
+}
+  
 export async function fetch_gecko(pool: string) {
-    try{
-        const res = await axios.get(`https://api.geckoterminal.com/api/v2/networks/solana/pools/${pool}`);
-        return res.data.data;
-    }catch (err) {
-        console.log("Gecko limit hit!!");
+    let retries = 0;
+    const maxRetries = 5;
+    let delay = 5000;
+    while (retries < maxRetries) {
+        try {
+            const res = await axios.get(`https://api.geckoterminal.com/api/v2/networks/solana/pools/${pool}`);
+            return res.data.data;
+        } catch (error: unknown) {
+            if (axios.isAxiosError(error) && error.response && error.response.status === 429) {
+                await sleep(delay + randomJitter());
+                delay *= 2;
+                retries += 1;
+            } else {
+                throw error;
+            }
+        }
     }
+    throw new Error("Failed to fetch after maximum retries");
 }
 
 // Using data from DexScreener as default. In case of NULL, GeckoTerminal data is used.
