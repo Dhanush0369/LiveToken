@@ -17,7 +17,7 @@ export type TokenSchema = {
     protocol: string;
 };
 
-export type FilterDataSchema = {
+export type FilterSchema = {
     token_address: string;
     token_name: string;
     token_ticker: string;
