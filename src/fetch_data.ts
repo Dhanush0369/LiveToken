@@ -3,7 +3,7 @@ import Redis from 'ioredis';
 import { tokens } from './token_data';
 import { TokenSchema } from './schema';
 
-const redis = new Redis();
+const redis = new Redis(process.env.REDIS_URL!);
 
 export async function fetch_DexScreener(token: string) {
     try{

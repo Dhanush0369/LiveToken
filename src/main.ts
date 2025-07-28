@@ -11,7 +11,7 @@ const app = express();
 const server = http.createServer(app);
 const wss = new WebSocketServer({ server });
 const clients = new Set<WebSocket>();
-const redis = new Redis();
+const redis = new Redis(process.env.REDIS_URL!);
 
 (async () =>{
     await redis.set('filter', 'unset');
