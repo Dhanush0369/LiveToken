@@ -5,14 +5,6 @@ import { TokenSchema } from './schema';
 
 const redis = new Redis(process.env.REDIS_URL!);
 
-export async function fetch_DexScreener(token: string) {
-    try{
-        const res = await axios.get(`https://api.dexscreener.com/latest/dex/tokens/${token}`);
-        return res.data.pairs;
-    }catch (err) {
-        console.error("Aggregator dexscreener error", err);
-    }
-}
 
 function sleep(ms: number) {
     return new Promise(resolve => setTimeout(resolve, ms));
@@ -21,7 +13,21 @@ function sleep(ms: number) {
 function randomJitter(maxJitter = 500) {
     return Math.floor(Math.random() * maxJitter);
 }
-  
+
+
+// 300 request per min, No Rate limit problem
+export async function fetch_DexScreener(token: string) {
+    try{
+        const res = await axios.get(`https://api.dexscreener.com/latest/dex/tokens/${token}`);
+        const result =res.data.pairs;
+        return result[0];
+    }catch (err) {
+        // console.error("Aggregator dexscreener error", err);
+        console.log("Got NULL data from dexscreener");
+    }
+}
+
+// 30 request per min, Using exponential backoff Rate limit problem
 export async function fetch_gecko(pool: string) {
     let retries = 0;
     const maxRetries = 5;
@@ -75,7 +81,7 @@ export async function fetch_from_APIs(){
             const dataDex = await fetch_DexScreener(token);
             const datagecko = await fetch_gecko(pool);
 
-            const result = merge(dataDex[0],datagecko);
+            const result = merge(dataDex,datagecko);
             const key = `token:${result.token_address}`;
             await redis.set(key, JSON.stringify(result), 'EX', 40);
         }catch(err){
