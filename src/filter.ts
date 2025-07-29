@@ -1,6 +1,5 @@
+// Data filtering and sorting logic
 import { FilterSchema, TokenSchema } from "./schema";
-
-
 
 export function filter_data(data: TokenSchema[],filter: string){
     const result: FilterSchema[]=[];

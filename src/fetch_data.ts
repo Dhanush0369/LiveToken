@@ -1,3 +1,4 @@
+// API integration and data fetching
 import axios from 'axios';
 import Redis from 'ioredis';
 import { tokens } from './token_data';
@@ -83,7 +84,7 @@ export async function fetch_from_APIs(){
 
             const result = merge(dataDex,datagecko);
             const key = `token:${result.token_address}`;
-            await redis.set(key, JSON.stringify(result), 'EX', 40);
+            await redis.set(key, JSON.stringify(result), 'EX', 60);
         }catch(err){
             console.error("Error While fetching data:",err);
         }

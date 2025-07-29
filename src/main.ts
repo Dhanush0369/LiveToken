@@ -55,7 +55,7 @@ async function scheduled_task(){
         }
 
         
-        console.log("Process finished");
+        console.log("Data Updated");
     }catch(err){
         console.error("Error in schedulded task", err);
     }

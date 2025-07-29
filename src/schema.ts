@@ -1,3 +1,5 @@
+// TypeScript type definitions
+
 export type TokenSchema = {
     token_address: string;
     token_name: string;
