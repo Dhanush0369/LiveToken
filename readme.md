@@ -10,10 +10,10 @@ A TypeScript-based service that provides real-time cryptocurrency token data thr
 
 ## Features
 - Real-time token price and market data streaming
-- Data aggregation from ```DexScreener``` & ```GeckoTerminal```
+- Data aggregation from `DexScreener` & `GeckoTerminal`
 - WebSocket support for live updates
-- Filtering capabilities by time periods (1h, 6h, 24h)
-- Sorting options by volume, price change, and market cap
+- Filtering capabilities by time periods (`1h`, `6h`, `24h`)
+- Sorting options by `volume`, `price change`, & `market cap`
 - Redis caching for improved performance
 
 ## Tech Stack
@@ -35,7 +35,7 @@ GET https://livetoken-production-c13d.up.railway.app/
 ```
 
 Example Response:
-```json
+```jsonc
 {
   "tokens": [
     {
@@ -80,7 +80,7 @@ This request will:
 2. Sort results by trading volume in descending order
 
 Example Response:
-```json
+```jsonc
 {
   "tokens": [
     {
@@ -95,20 +95,43 @@ Example Response:
       "price_change": -3.55,
       "protocol": "raydium"
     },
-    // ... more tokens sorted by volume
+    // ... more tokens
   ]
 }
 ```
 
 Error Responses:
-```json
+```jsonc
 // Invalid filter or sortBy parameter
 {
   "error": "Invalid Query Parameters"
 }
-
 ```
 
+## Scheduled Tasks
+
+### 1. Task Initialization
+- Task runs every 30 seconds using node-cron scheduler
+- Maintains real-time data consistency across all clients
+- Handles automatic data refresh without manual intervention
+
+### 2. Data Collection Process
+- Fetches latest token data from DexScreener API
+- Retrieves market data from GeckoTerminal API
+- Combines and normalizes data from multiple sources
+- Caches processed data in Redis for performance
+
+### 3. Data Processing Pipeline
+- Extracts stored token data from Redis cache
+- Retrieves active filter preferences
+- Applies sorting criteria if configured
+- Prepares formatted data for distribution
+
+### 4. WebSocket Broadcasting
+- Broadcasts updated data to all connected clients
+- Maintains separate data streams for filtered results
+- Ensures real-time data synchronization
+- Handles client connection management
 
 ## Local Development Setup
 
@@ -146,8 +169,4 @@ Server will start at `http://localhost:3000`
 - Server errors: 500 Internal Server Error
 - All errors include descriptive error messages
 
-## Data Updates
-Data is automatically refreshed every 30 seconds using node-cron:
-```typescript
-cron.schedule('*/30 * * * * *', scheduled_task);
-```
+
